@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTG Sets - You Lost The Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-dragon"></i> Magic: The Gathering Sets</h1>
+        <p class="subtitle">Ontdek alle Magic sets - brought to you by You Lost The Game</p>
+        
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Zoek op set naam..." onkeyup="filterSets()">
+            </div>
+        </div>
+        
+        <div class="filter-box">
+            <div class="filter-wrapper">
+                <i class="fas fa-filter filter-icon"></i>
+                <select id="typeFilter" onchange="filterByType()">
+                    <option value="">Alle types</option>
+                    <option value="expansion">Expansion</option>
+                    <option value="commander">Commander</option>
+                    <option value="core">Core Set</option>
+                    <option value="masters">Masters</option>
+                    <option value="draft_innovation">Draft Innovation</option>
+                    <option value="masterpiece">Masterpiece</option>
+                    <option value="token">Token</option>
+                    <option value="box">Box</option>
+                    <option value="promo">Promo</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="sets-grid" id="setsGrid">
+            {% for set in sets %}
+            <a href="/set/{{ set.code }}" class="set-card" data-name="{{ set.name.lower() }}" data-type="{{ set.set_type }}">
+                {% if set.icon_svg_uri %}
+                <img src="{{ set.icon_svg_uri }}" alt="{{ set.name }}" class="set-icon">
+                {% else %}
+                <div class="set-icon-placeholder"><i class="fas fa-layer-group"></i></div>
+                {% endif %}
+                <div class="set-name">{{ set.name }}</div>
+                <div class="set-code"><i class="fas fa-code"></i> Code: {{ set.code }}</div>
+                <div class="set-release"><i class="fas fa-calendar-alt"></i> Released: {{ set.released_at }}</div>
+                <span class="set-type"><i class="fas fa-tag"></i> {{ set.set_type }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        
+        <div class="stats">
+            <p><i class="fas fa-database"></i> Totaal aantal sets: {{ sets|length }}</p>
+        </div>
+        
+        <div class="footer">
+            <p><i class="fas fa-database"></i> Data provided by <a href="https://scryfall.com" target="_blank">Scryfall</a></p>
+            <p><i class="fas fa-store"></i> &copy; 2025 You Lost The Game - Local Game Store</p>
+        </div>
+    </div>
+    
+    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <script>
+        function filterSets() {
+            applyFilters();
+        }
+        
+        function filterByType() {
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const typeFilter = document.getElementById('typeFilter');
+            const searchFilter = searchInput.value.toLowerCase();
+            const typeValue = typeFilter.value;
+            const cards = document.getElementsByClassName('set-card');
+            
+            for (let i = 0; i < cards.length; i++) {
+                const name = cards[i].getAttribute('data-name');
+                const type = cards[i].getAttribute('data-type');
+                
+                const matchesSearch = name.includes(searchFilter);
+                const matchesType = typeValue === '' || type === typeValue;
+                
+                if (matchesSearch && matchesType) {
+                    cards[i].style.display = '';
+                } else {
+                    cards[i].style.display = 'none';
+                }
+            }
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Show/hide back to top button
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'block';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
